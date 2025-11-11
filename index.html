@@ -45,6 +45,10 @@
             border-radius: 7px;
         }
 
+        #status-dock {
+            margin-bottom: 20px;
+        }
+
         .cell {
             color: #333;
             background-color: #f0f0f0;
@@ -72,6 +76,7 @@
 <body>
     <div class="container">
         <h1>Tic Tac Toe</h1>
+        <div id="status-dock"></div>
         <div id="board"></div>
     </div>
 
@@ -80,7 +85,15 @@
         let currentPlayer = 'X';
         let boardState = Array(9).fill(null);
 
-        //Create board element
+        // // Set up status dock
+        // const statusDock = document.getElementById('status-dock');
+        // let statusText = document.createElement('div');
+        // let restartButton = document.createElement('button');
+        // restartButton.textContent = 'Restart Game';
+        // statusDock.appendChild(restartButton);
+        // updateStatus();
+
+        // Create board element
         const board = document.getElementById('board');
 
         // Create 9 cells (3x3 grid)
@@ -93,12 +106,37 @@
             // Add click event listener to each cell
             cell.onclick = () => {
                 if (boardState[i] === null) {
-                    boardState[i] = currentPlayer;
-                    cell.textContent = currentPlayer;
-                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    makeMove(cell, i);
                 }
             };
         }
+
+        function makeMove(cell, i) {
+            boardState[i] = currentPlayer;
+            cell.textContent = currentPlayer;
+            // checkGameOver();
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            // updateStatus();
+        }
+
+        // function checkGameOver() {
+        //     // Check for win conditions or draw here
+        //     if (boardState[0] === boardState[1] === boardState[2] && boardState[0] !== null) {
+        //         console.log('Game Over!');
+        //     }
+        //     console.log('Not Over!');
+        //     // if (boardState[3] === boardState[4] === boardState[5] && boardState[3] !== null) {
+        //     //     alert('Game Over!');
+        //     // }
+        //     // if (boardState[6] === boardState[7] === boardState[8] && boardState[6] !== null) {
+        //     //     alert('Game Over!');
+        //     // }
+        // }
+        // function updateStatus() {
+        //     statusText.textContent = 'Current Player: ' + currentPlayer;
+        //     statusDock.appendChild(statusText);
+        // }
     </script>
 </body>
 
