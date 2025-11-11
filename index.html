@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <style>
+        :root {
+            font-family: system-ui, Arial, Helvetica, sans-serif;
+            line-height: 1.5;
+            font-weight: 400;
+            color: #333;
+            background-color: #f0f0f0;
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            place-items: center;
+            min-width: 320px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        #board {
+            display: grid;
+            background-color: #333;
+            grid-template-columns: repeat(3, 120px);
+            grid-template-rows: repeat(3, 120px);
+            gap: 10px;
+            margin: 0 auto;
+            padding: 10px;
+            border-radius: 7px;
+        }
+
+        .cell {
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            font-size: 48px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .cell:hover {
+            background-color: #d5d5d5;
+        }
+
+        .cell:disabled {
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic Tac Toe</h1>
+        <div id="board"></div>
+    </div>
+
+    <script>
+        //Create board element
+        const board = document.getElementById('board');
+
+        // Create 9 cells (3x3 grid)
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement('button');
+            cell.classList.add('cell');
+            cell.dataset.index = i; // Store the cell index
+            board.appendChild(cell);
+        }
+
+        console.log('Board created with 9 cells');
+    </script>
+</body>
+
+</html>
