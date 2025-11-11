@@ -45,9 +45,9 @@
             border-radius: 7px;
         }
 
-        #status-dock {
+        /* #status-dock {
             margin-bottom: 20px;
-        }
+        } */
 
         .cell {
             color: #333;
@@ -69,6 +69,7 @@
 
         .cell:disabled {
             cursor: not-allowed;
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -76,7 +77,7 @@
 <body>
     <div class="container">
         <h1>Tic Tac Toe</h1>
-        <div id="status-dock"></div>
+        <!-- <div id="status-dock"></div> -->
         <div id="board"></div>
     </div>
 
@@ -105,19 +106,23 @@
 
             // Add click event listener to each cell
             cell.onclick = () => {
-                if (boardState[i] === null) {
-                    makeMove(cell, i);
-                }
-            };
+                if (makeMove(cell, i)) {
+                    // checkGameOver();
+                    // updateStatus();
+                    console.log(boardState)
+                };
+            }
         }
 
         function makeMove(cell, i) {
+            if (boardState[i] !== null) return false;
+
             boardState[i] = currentPlayer;
             cell.textContent = currentPlayer;
-            // checkGameOver();
-
+            cell.disabled = true;
             currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            // updateStatus();
+
+            return true;
         }
 
         // function checkGameOver() {
