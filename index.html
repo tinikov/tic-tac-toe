@@ -46,6 +46,7 @@
         }
 
         .cell {
+            color: #333;
             background-color: #f0f0f0;
             border: none;
             border-radius: 5px;
@@ -75,6 +76,10 @@
     </div>
 
     <script>
+        // Game state variables
+        let currentPlayer = 'X';
+        let boardState = Array(9).fill(null);
+
         //Create board element
         const board = document.getElementById('board');
 
@@ -84,9 +89,16 @@
             cell.classList.add('cell');
             cell.dataset.index = i; // Store the cell index
             board.appendChild(cell);
-        }
 
-        console.log('Board created with 9 cells');
+            // Add click event listener to each cell
+            cell.onclick = () => {
+                if (boardState[i] === null) {
+                    boardState[i] = currentPlayer;
+                    cell.textContent = currentPlayer;
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
+            };
+        }
     </script>
 </body>
 
