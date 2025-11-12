@@ -115,6 +115,14 @@
         // ======= Functions =======
         // Renderers
         function renderStatusDisplay(display, gameState) {
+            if (!gameState.isGameActive) {
+                if (gameState.winner) {
+                    display.textContent = `${gameState.winner} wins ⛄︎ ${gameState.winner} 获胜`;
+                } else {
+                    display.textContent = `Draw ☹︎ 平局`;
+                }
+                return;
+            }
             display.textContent = `${gameState.currentPlayer}'s turn ☺︎ 轮到 ${gameState.currentPlayer} 了`;
         }
 
@@ -163,21 +171,22 @@
                 boardState: [...gameState.boardState]
             };
 
-            // Check for draw
-            if (checkDraw(gameState)) {
-                nextState.isGameActive = false;
-                return nextState;
-            }
+            nextState.boardState[index] = gameState.currentPlayer;
 
             // Check for winner
-            const winner = checkWinner(gameState);
+            const winner = checkWinner(nextState);
             if (winner) {
-                nextState.winner = winner;
                 nextState.isGameActive = false;
+                nextState.winner = winner;
                 return nextState;
             }
 
-            nextState.boardState[index] = gameState.currentPlayer;
+            // Check for draw
+            if (checkDraw(nextState)) {
+                nextState.isGameActive = false;
+                nextState.winner = null;
+                return nextState;
+            }
 
             // Switch player
             nextState.currentPlayer = gameState.currentPlayer === 'X' ? 'O' : 'X';
@@ -215,7 +224,7 @@
 
         // Reset game
         function resetGame(initialStatus, cells, statusDisplay) {
-            newState = {
+            const newState = {
                 ...initialStatus,
                 boardState: [...initialStatus.boardState]
             };
@@ -259,19 +268,6 @@
         }
 
         gameState = resetGame(initialStatus, cells, statusDisplay);
-
-        // Check for winner or draw after each move
-        function updateGameStatus() {
-            if (!gameState.isGameActive) {
-                if (gameState.winner) {
-                    statusDisplay.textContent = `${gameState.winner} wins! 🎉 ${gameState}`
-                } else {
-                    statusDisplay.textContent = `It's a draw! 🤝 平局！`;
-                }
-            }
-        }
-
-        updateGameStatus();
     </script>
 </body>
 
