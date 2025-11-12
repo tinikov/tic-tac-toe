@@ -12,6 +12,11 @@
             font-weight: 400;
             color: #333;
             background-color: #f0f0f0;
+
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
@@ -30,8 +35,12 @@
         }
 
         h1 {
+            margin: auto;
             color: #333;
-            margin-bottom: 40px;
+        }
+
+        #status-dock {
+            margin: 40px auto;
         }
 
         #board {
@@ -40,14 +49,10 @@
             grid-template-columns: repeat(3, 120px);
             grid-template-rows: repeat(3, 120px);
             gap: 10px;
-            margin: 0 auto;
+            margin: auto;
             padding: 10px;
             border-radius: 7px;
         }
-
-        /* #status-dock {
-            margin-bottom: 20px;
-        } */
 
         .cell {
             color: #333;
@@ -77,7 +82,7 @@
 <body>
     <div class="container">
         <h1>Tic Tac Toe</h1>
-        <!-- <div id="status-dock"></div> -->
+        <div id="status-dock">empty</div>
         <div id="board"></div>
     </div>
 
@@ -107,8 +112,8 @@
             // Add click event listener to each cell
             cell.onclick = () => {
                 if (makeMove(cell, i)) {
-                    // checkGameOver();
                     // updateStatus();
+                    checkGameOver();
                     console.log(boardState)
                 };
             }
@@ -126,18 +131,34 @@
         }
 
         // function checkGameOver() {
-        //     // Check for win conditions or draw here
-        //     if (boardState[0] === boardState[1] === boardState[2] && boardState[0] !== null) {
-        //         console.log('Game Over!');
+        //     const winningCombinations = [
+        //         [0, 1, 2],
+        //         [3, 4, 5],
+        //         [6, 7, 8],
+        //         [0, 3, 6],
+        //         [1, 4, 7],
+        //         [2, 5, 8],
+        //         [0, 4, 8],
+        //         [2, 4, 6]
+        //     ];
+
+        //     for (const combination of winningCombinations) {
+        //         const [a, b, c] = combination;
+        //         if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+        //             alert(`Player ${boardState[a]} wins!`);
+
+        //             for (cell of board.children) {
+        //                 cell.disabled = true;
+        //             }
+        //             return;
+        //         }
         //     }
-        //     console.log('Not Over!');
-        //     // if (boardState[3] === boardState[4] === boardState[5] && boardState[3] !== null) {
-        //     //     alert('Game Over!');
-        //     // }
-        //     // if (boardState[6] === boardState[7] === boardState[8] && boardState[6] !== null) {
-        //     //     alert('Game Over!');
-        //     // }
+
+
+        //     // Check for win conditions or draw here
+
         // }
+
         // function updateStatus() {
         //     statusText.textContent = 'Current Player: ' + currentPlayer;
         //     statusDock.appendChild(statusText);
