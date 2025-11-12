@@ -24,7 +24,6 @@
             margin: 0;
             display: flex;
             place-items: center;
-            min-width: 320px;
             min-height: 100vh;
         }
 
@@ -48,13 +47,13 @@
         .container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 2rem;
             text-align: center;
         }
 
         #game-title {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 100;
+            max-width: 400px;
         }
 
         #status-display {
@@ -103,15 +102,16 @@
 <body>
     <div class="container">
         <div id="game-title">
-            Tic Tac Toe
+            Tic Tac Toe 井字棋
         </div>
         <div id="status-display"></div>
         <div id="board"></div>
-        <button id="restart-button"">↺</button>
+        <button id="restart-button">↺</button>
     </div>
 
     <script>
         // ======= Functions =======
+        // Renderers
         function renderStatusDock(dock, gameState) {
             dock.textContent = `${gameState.currentPlayer}'s turn`;
         }
@@ -139,6 +139,17 @@
             return cells;
         }
 
+        function renderGame(gameState, cells, statusDisplay) {
+            //Update cells
+            cells.forEach((cell, index) => {
+                cell.textContent = gameState.boardState[index] || '';
+                cell.disabled = gameState.boardState[index] !== null || !gameState.isGameActive;
+            });
+
+            renderStatusDock(statusDisplay, gameState);
+        }
+
+        // Game logic
         function makeMove(index, gameState) {
 
             if (!gameState.isGameActive || gameState.boardState[index] !== null) {
@@ -196,10 +207,6 @@
         //     }
         // }
 
-        function restartGame(initialStatus, statusDock, board) {
-            renderStatusDock(statusDock, initialStatus);
-        }
-
         // ======== Main =======
         // Game constants
         const BOARD_SIZE = 3;
@@ -210,34 +217,30 @@
         const board = document.getElementById('board');
         const restartButton = document.getElementById('restart-button');
 
-        // Initial game state
         const initialStatus = {
             boardState: Array(CELL_COUNT).fill(null),
             currentPlayer: 'X',
             isGameActive: true,
             winner: null
-        }
-
-        let gameState = {
-            ...initialStatus,
-            boardState: [...initialStatus.boardState]
         };
+
+        let gameState = { ...initialStatus };
 
         // Initialize game
         const cells = renderBoard(board, BOARD_SIZE);
         cells.forEach((cell, index) => {
             cell.onclick = () => {
                 const newState = makeMove(index, gameState);
-
                 if (newState !== gameState) {
                     gameState = newState;
-                    cell.textContent = gameState.boardState[index];
-                    cell.disabled = true;
-                    renderStatusDock(statusDisplay, gameState);
+                    renderGame(gameState, cells, statusDisplay);
                 }
             };
         });
-        resetGame();
+
+        restartButton.onclick = () => {
+            resetGame();
+        }
 
         function resetGame() {
             gameState = { ...initialStatus };
