@@ -91,7 +91,7 @@
         let currentPlayer = 'X';
         let boardState = Array(9).fill(null);
 
-        // // Set up status dock
+        // Set up status dock
         // const statusDock = document.getElementById('status-dock');
         // let statusText = document.createElement('div');
         // let restartButton = document.createElement('button');
@@ -130,34 +130,34 @@
             return true;
         }
 
-        // function checkGameOver() {
-        //     const winningCombinations = [
-        //         [0, 1, 2],
-        //         [3, 4, 5],
-        //         [6, 7, 8],
-        //         [0, 3, 6],
-        //         [1, 4, 7],
-        //         [2, 5, 8],
-        //         [0, 4, 8],
-        //         [2, 4, 6]
-        //     ];
+        function checkGameOver() {
+            const winningCombinations = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
 
-        //     for (const combination of winningCombinations) {
-        //         const [a, b, c] = combination;
-        //         if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-        //             alert(`Player ${boardState[a]} wins!`);
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+                    alert(`Player ${boardState[a]} wins!`);
 
-        //             for (cell of board.children) {
-        //                 cell.disabled = true;
-        //             }
-        //             return;
-        //         }
-        //     }
+                    for (cell of board.children) {
+                        cell.disabled = true;
+                    }
+                    return;
+                }
+            }
 
 
-        //     // Check for win conditions or draw here
+            // Check for win conditions or draw here
 
-        // }
+        }
 
         // function updateStatus() {
         //     statusText.textContent = 'Current Player: ' + currentPlayer;
