@@ -54,16 +54,18 @@
             font-size: 3rem;
             font-weight: 100;
             max-width: 400px;
+            background-color: #f0f0f0;
         }
 
         #status-display {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: -5px;
+            font-size: 1.5rem;
+            /* font-weight: 600; */
             color: #515151;
             background: #e0e0e0;
-            padding: 10px;
+            padding-top: 10px;
+            padding-bottom: 15px;
             border-radius: 7px;
         }
 
@@ -77,19 +79,19 @@
         #restart-button {
             font-size: 1.5rem;
             font-weight: 600;
-            margin-top: 50px;
+            margin-top: 43px;
         }
 
         .cell {
             border: none;
             border-radius: 3px;
-            font-size: 48px;
+            font-size: 5rem;
             font-weight: bold;
+            ;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.2s;
         }
 
         .cell:disabled {
@@ -112,8 +114,8 @@
     <script>
         // ======= Functions =======
         // Renderers
-        function renderStatusDock(dock, gameState) {
-            dock.textContent = `${gameState.currentPlayer}'s turn`;
+        function renderStatusDisplay(display, gameState) {
+            display.textContent = `${gameState.currentPlayer}'s turn ☺︎ 轮到 ${gameState.currentPlayer} 了`;
         }
 
         function renderBoard(board, size) {
@@ -139,14 +141,14 @@
             return cells;
         }
 
-        function renderGame(gameState, cells, statusDisplay) {
+        function renderGame(gameState, cells, display) {
             //Update cells
             cells.forEach((cell, index) => {
                 cell.textContent = gameState.boardState[index] || '';
                 cell.disabled = gameState.boardState[index] !== null || !gameState.isGameActive;
             });
 
-            renderStatusDock(statusDisplay, gameState);
+            renderStatusDisplay(display, gameState);
         }
 
         // Game logic
@@ -161,51 +163,65 @@
                 boardState: [...gameState.boardState]
             };
 
+            // Check for draw
+            if (checkDraw(gameState)) {
+                nextState.isGameActive = false;
+                return nextState;
+            }
+
+            // Check for winner
+            const winner = checkWinner(gameState);
+            if (winner) {
+                nextState.winner = winner;
+                nextState.isGameActive = false;
+                return nextState;
+            }
+
             nextState.boardState[index] = gameState.currentPlayer;
+
+            // Switch player
             nextState.currentPlayer = gameState.currentPlayer === 'X' ? 'O' : 'X';
 
             return nextState;
         }
-        // function makeMove(index, gameStatus) {
-        //     if (!gameStatus.isGameActive || gameStatus.boardState[index]) {
-        //         return false;
-        //     }
 
-        //     gameStatus.boardState[i] = gameStatus.currentPlayer;
-        //     cell.textContent = currentPlayer;
-        //     cell.disabled = true;
-        //     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        function checkWinner(gameState) {
+            const winningCombinations = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
 
-        //     return true;
-        // }
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (gameState.boardState[a] &&
+                    gameState.boardState[a] === gameState.boardState[b] &&
+                    gameState.boardState[a] === gameState.boardState[c]) {
+                    return gameState.boardState[a];
+                }
+            }
 
-        // function disableBoard(board) {
-        //     for (const cell of board.children) {
-        //         cell.disabled = true;
-        //     }
-        // }
+            return null;
+        }
 
-        // function isCurrentPlayerWin() {
-        //     const winningCombinations = [
-        //         [0, 1, 2],
-        //         [3, 4, 5],
-        //         [6, 7, 8],
-        //         [0, 3, 6],
-        //         [1, 4, 7],
-        //         [2, 5, 8],
-        //         [0, 4, 8],
-        //         [2, 4, 6]
-        //     ];
+        function checkDraw(gameState) {
+            return gameState.boardState.every(cell => cell !== null);
+        }
 
-        //     for (const combination of winningCombinations) {
-        //         const [a, b, c] = combination;
-        //         if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-        //             console.log(`Player ${boardState[a]} wins!`);
-
-        //             return true;
-        //         }
-        //     }
-        // }
+        // Reset game
+        function resetGame(initialStatus, cells, statusDisplay) {
+            newState = {
+                ...initialStatus,
+                boardState: [...initialStatus.boardState]
+            };
+            renderGame(newState, cells, statusDisplay);
+            return newState;
+        }
 
         // ======== Main =======
         // Game constants
@@ -224,7 +240,7 @@
             winner: null
         };
 
-        let gameState = { ...initialStatus };
+        let gameState;
 
         // Initialize game
         const cells = renderBoard(board, BOARD_SIZE);
@@ -239,24 +255,23 @@
         });
 
         restartButton.onclick = () => {
-            resetGame();
+            gameState = resetGame(initialStatus, cells, statusDisplay);
         }
 
-        function resetGame() {
-            gameState = { ...initialStatus };
-            // Update UI
-            renderStatusDock(statusDisplay, initialStatus);
-            cells.forEach(cell => {
-                cell.textContent = '';
-                cell.disabled = false;
-            });
+        gameState = resetGame(initialStatus, cells, statusDisplay);
+
+        // Check for winner or draw after each move
+        function updateGameStatus() {
+            if (!gameState.isGameActive) {
+                if (gameState.winner) {
+                    statusDisplay.textContent = `${gameState.winner} wins! 🎉 ${gameState}`
+                } else {
+                    statusDisplay.textContent = `It's a draw! 🤝 平局！`;
+                }
+            }
         }
 
-
-        // Setup restart button
-        restartButton.onclick = () => {
-            resetGame();
-        };
+        updateGameStatus();
     </script>
 </body>
 
