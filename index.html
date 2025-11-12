@@ -57,7 +57,7 @@
             font-weight: 100;
         }
 
-        #status-dock {
+        #status-display {
             margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.2rem;
@@ -69,11 +69,7 @@
         }
 
         #board {
-            display: grid;
             background-color: #333;
-            grid-template-columns: repeat(3, 120px);
-            grid-template-rows: repeat(3, 120px);
-            gap: 10px;
             margin: auto;
             padding: 10px;
             border-radius: 7px;
@@ -109,97 +105,155 @@
         <div id="game-title">
             Tic Tac Toe
         </div>
-        <div id="status-dock"></div>
+        <div id="status-display"></div>
         <div id="board"></div>
-        <button id="restart-button" onclick="restartGame()">↻</button>
+        <button id="restart-button"">↺</button>
     </div>
 
     <script>
-        // Game state variables
-        let currentPlayer = 'X';
-        let boardState = Array(9).fill(null);
+        // ======= Functions =======
+        function renderStatusDock(dock, gameState) {
+            dock.textContent = `${gameState.currentPlayer}'s turn`;
+        }
 
-        // Create status dock
-        const statusDock = document.getElementById('status-dock');
-        updateStatus();
+        function renderBoard(board, size) {
+            // Create grid layout
+            board.innerHTML = ''; // Clear existing board
+            board.style.display = 'grid';
+            board.style.gridTemplateColumns = `repeat(${size}, 120px)`;
+            board.style.gridTemplateRows = `repeat(${size}, 120px)`;
+            board.style.gap = '10px';
 
-        // Create board element
+            // Create cells
+            const cells = [];
+            for (let i = 0; i < size ** 2; i++) {
+                const cell = document.createElement('button');
+                cell.classList.add('cell');
+                cell.textContent = '';
+                cell.dataset.index = i;
+                cells.push(cell);
+
+                board.appendChild(cell);
+            }
+
+            return cells;
+        }
+
+        function makeMove(index, gameState) {
+
+            if (!gameState.isGameActive || gameState.boardState[index] !== null) {
+                return gameState;
+            }
+
+            const nextState = {
+                ...gameState,
+                boardState: [...gameState.boardState]
+            };
+
+            nextState.boardState[index] = gameState.currentPlayer;
+            nextState.currentPlayer = gameState.currentPlayer === 'X' ? 'O' : 'X';
+
+            return nextState;
+        }
+        // function makeMove(index, gameStatus) {
+        //     if (!gameStatus.isGameActive || gameStatus.boardState[index]) {
+        //         return false;
+        //     }
+
+        //     gameStatus.boardState[i] = gameStatus.currentPlayer;
+        //     cell.textContent = currentPlayer;
+        //     cell.disabled = true;
+        //     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+
+        //     return true;
+        // }
+
+        // function disableBoard(board) {
+        //     for (const cell of board.children) {
+        //         cell.disabled = true;
+        //     }
+        // }
+
+        // function isCurrentPlayerWin() {
+        //     const winningCombinations = [
+        //         [0, 1, 2],
+        //         [3, 4, 5],
+        //         [6, 7, 8],
+        //         [0, 3, 6],
+        //         [1, 4, 7],
+        //         [2, 5, 8],
+        //         [0, 4, 8],
+        //         [2, 4, 6]
+        //     ];
+
+        //     for (const combination of winningCombinations) {
+        //         const [a, b, c] = combination;
+        //         if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+        //             console.log(`Player ${boardState[a]} wins!`);
+
+        //             return true;
+        //         }
+        //     }
+        // }
+
+        function restartGame(initialStatus, statusDock, board) {
+            renderStatusDock(statusDock, initialStatus);
+        }
+
+        // ======== Main =======
+        // Game constants
+        const BOARD_SIZE = 3;
+        const CELL_COUNT = BOARD_SIZE * BOARD_SIZE;
+
+        // DOM elements
+        const statusDisplay = document.getElementById('status-display');
         const board = document.getElementById('board');
+        const restartButton = document.getElementById('restart-button');
 
-        // Create 9 cells (3x3 grid)
-        for (let i = 0; i < 9; i++) {
-            const cell = document.createElement('button');
-            cell.classList.add('cell');
-            cell.dataset.index = i; // Store the cell index
-            board.appendChild(cell);
+        // Initial game state
+        const initialStatus = {
+            boardState: Array(CELL_COUNT).fill(null),
+            currentPlayer: 'X',
+            isGameActive: true,
+            winner: null
+        }
 
-            // Add click event listener to each cell
+        let gameState = {
+            ...initialStatus,
+            boardState: [...initialStatus.boardState]
+        };
+
+        // Initialize game
+        const cells = renderBoard(board, BOARD_SIZE);
+        cells.forEach((cell, index) => {
             cell.onclick = () => {
-                if (makeMove(cell, i)) {
-                    // updateStatus();
-                    isCurrentPlayerWin();
-                    console.log(boardState)
-                };
-            }
-        }
+                const newState = makeMove(index, gameState);
 
-        function updateStatus() {
-            statusDock.textContent = `${currentPlayer}'s turn`;
-        }
-
-        function disableBoard() {
-            for (const cell of board.children) {
-                cell.disabled = true;
-            }
-        }
-
-        function makeMove(cell, i) {
-            if (boardState[i] !== null) return false;
-
-            boardState[i] = currentPlayer;
-            cell.textContent = currentPlayer;
-            cell.disabled = true;
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-
-            return true;
-        }
-
-        function isCurrentPlayerWin() {
-            const winningCombinations = [
-                [0, 1, 2],
-                [3, 4, 5],
-                [6, 7, 8],
-                [0, 3, 6],
-                [1, 4, 7],
-                [2, 5, 8],
-                [0, 4, 8],
-                [2, 4, 6]
-            ];
-
-            for (const combination of winningCombinations) {
-                const [a, b, c] = combination;
-                if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-                    console.log(`Player ${boardState[a]} wins!`);
-
-                    return true;
+                if (newState !== gameState) {
+                    gameState = newState;
+                    cell.textContent = gameState.boardState[index];
+                    cell.disabled = true;
+                    renderStatusDock(statusDisplay, gameState);
                 }
-            }
-        }
+            };
+        });
+        resetGame();
 
-        function restartGame() {
-            currentPlayer = 'X';
-            boardState = Array(9).fill(null);
-            for (const cell of board.children) {
+        function resetGame() {
+            gameState = { ...initialStatus };
+            // Update UI
+            renderStatusDock(statusDisplay, initialStatus);
+            cells.forEach(cell => {
                 cell.textContent = '';
                 cell.disabled = false;
-            }
-            // updateStatus();
+            });
         }
 
-        // function updateStatus() {
-        //     statusText.textContent = 'Current Player: ' + currentPlayer;
-        //     statusDock.appendChild(statusText);
-        // }
+
+        // Setup restart button
+        restartButton.onclick = () => {
+            resetGame();
+        };
     </script>
 </body>
 
