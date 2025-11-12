@@ -8,6 +8,7 @@
     <style>
         :root {
             font-family: system-ui, Arial, Helvetica, sans-serif;
+            font-size: 16px;
             line-height: 1.5;
             font-weight: 400;
             color: #333;
@@ -27,6 +28,23 @@
             min-height: 100vh;
         }
 
+        button {
+            font-family: inherit;
+            font-weight: inherit;
+            font-size: inherit;
+            color: inherit;
+            background-color: #f0f0f0;
+            padding: 8px 16px;
+            border: 2px solid #333;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #d5d5d5;
+        }
+
         .container {
             max-width: 1280px;
             margin: 0 auto;
@@ -34,13 +52,20 @@
             text-align: center;
         }
 
-        h1 {
-            margin: auto;
-            color: #333;
+        #game-title {
+            font-size: 3.5rem;
+            font-weight: 100;
         }
 
         #status-dock {
-            margin: 40px auto;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #515151;
+            background: #e0e0e0;
+            padding: 10px;
+            border-radius: 7px;
         }
 
         #board {
@@ -54,11 +79,15 @@
             border-radius: 7px;
         }
 
+        #restart-button {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 50px;
+        }
+
         .cell {
-            color: #333;
-            background-color: #f0f0f0;
             border: none;
-            border-radius: 5px;
+            border-radius: 3px;
             font-size: 48px;
             font-weight: bold;
             cursor: pointer;
@@ -66,10 +95,6 @@
             justify-content: center;
             align-items: center;
             transition: background-color 0.2s;
-        }
-
-        .cell:hover {
-            background-color: #d5d5d5;
         }
 
         .cell:disabled {
@@ -81,9 +106,12 @@
 
 <body>
     <div class="container">
-        <h1>Tic Tac Toe</h1>
-        <div id="status-dock">empty</div>
+        <div id="game-title">
+            Tic Tac Toe
+        </div>
+        <div id="status-dock"></div>
         <div id="board"></div>
+        <button id="restart-button" onclick="restartGame()">↻</button>
     </div>
 
     <script>
@@ -91,13 +119,9 @@
         let currentPlayer = 'X';
         let boardState = Array(9).fill(null);
 
-        // Set up status dock
-        // const statusDock = document.getElementById('status-dock');
-        // let statusText = document.createElement('div');
-        // let restartButton = document.createElement('button');
-        // restartButton.textContent = 'Restart Game';
-        // statusDock.appendChild(restartButton);
-        // updateStatus();
+        // Create status dock
+        const statusDock = document.getElementById('status-dock');
+        updateStatus();
 
         // Create board element
         const board = document.getElementById('board');
@@ -113,9 +137,19 @@
             cell.onclick = () => {
                 if (makeMove(cell, i)) {
                     // updateStatus();
-                    checkGameOver();
+                    isCurrentPlayerWin();
                     console.log(boardState)
                 };
+            }
+        }
+
+        function updateStatus() {
+            statusDock.textContent = `${currentPlayer}'s turn`;
+        }
+
+        function disableBoard() {
+            for (const cell of board.children) {
+                cell.disabled = true;
             }
         }
 
@@ -130,7 +164,7 @@
             return true;
         }
 
-        function checkGameOver() {
+        function isCurrentPlayerWin() {
             const winningCombinations = [
                 [0, 1, 2],
                 [3, 4, 5],
@@ -145,18 +179,21 @@
             for (const combination of winningCombinations) {
                 const [a, b, c] = combination;
                 if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-                    alert(`Player ${boardState[a]} wins!`);
+                    console.log(`Player ${boardState[a]} wins!`);
 
-                    for (cell of board.children) {
-                        cell.disabled = true;
-                    }
-                    return;
+                    return true;
                 }
             }
+        }
 
-
-            // Check for win conditions or draw here
-
+        function restartGame() {
+            currentPlayer = 'X';
+            boardState = Array(9).fill(null);
+            for (const cell of board.children) {
+                cell.textContent = '';
+                cell.disabled = false;
+            }
+            // updateStatus();
         }
 
         // function updateStatus() {
