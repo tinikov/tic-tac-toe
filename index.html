@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap" rel="stylesheet">
     <title>Tic Tac Toe</title>
     <style>
         :root {
@@ -58,6 +61,9 @@
         }
 
         #status-display {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
             margin-top: 30px;
             margin-bottom: -5px;
             font-size: 1.5rem;
@@ -79,15 +85,15 @@
         #restart-button {
             font-size: 1.5rem;
             font-weight: 600;
-            margin-top: 43px;
+            margin-top: 41px;
         }
 
         .cell {
             border: none;
             border-radius: 3px;
-            font-size: 5rem;
-            font-weight: bold;
-            ;
+            font-family: "Gaegu", sans-serif;
+            font-size: 7rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -97,6 +103,16 @@
         .cell:disabled {
             cursor: not-allowed;
             background-color: #f0f0f0;
+        }
+
+        .cell.winning {
+            background-color: #A6DFA6;
+        }
+
+        .mark {
+            font-family: "Gaegu", sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -117,13 +133,13 @@
         function renderStatusDisplay(display, gameState) {
             if (!gameState.isGameActive) {
                 if (gameState.winner) {
-                    display.textContent = `${gameState.winner} wins ⛄︎ ${gameState.winner} 获胜`;
+                    display.innerHTML = `<span><span class="mark">${gameState.winner}</span> wins</span> <span>⛄︎</span> <span><span class="mark">${gameState.winner}</span> 获胜</span>`;
                 } else {
-                    display.textContent = `Draw ☹︎ 平局`;
+                    display.innerHTML = `<span>Draw</span> <span><span class="mark">XO</span></span> <span>平局</span>`;
                 }
                 return;
             }
-            display.textContent = `${gameState.currentPlayer}'s turn ☺︎ 轮到 ${gameState.currentPlayer} 了`;
+            display.innerHTML = `<span><span class="mark">${gameState.currentPlayer}</span>'s turn</span> <span>☺︎</span> <span>轮到 <span class="mark">${gameState.currentPlayer}</span> 了</span>`;
         }
 
         function renderBoard(board, size) {
@@ -154,8 +170,14 @@
             cells.forEach((cell, index) => {
                 cell.textContent = gameState.boardState[index] || '';
                 cell.disabled = gameState.boardState[index] !== null || !gameState.isGameActive;
+                // Highlight winning combination
+                if (gameState.winningCombination?.includes(index)) {
+                    cell.classList.add('winning');
+                } else {
+                    cell.classList.remove('winning');
+                }
             });
-
+            // Update status display
             renderStatusDisplay(display, gameState);
         }
 
@@ -174,10 +196,11 @@
             nextState.boardState[index] = gameState.currentPlayer;
 
             // Check for winner
-            const winner = checkWinner(nextState);
+            const { winner, winningCombination } = checkWinner(nextState);
             if (winner) {
                 nextState.isGameActive = false;
                 nextState.winner = winner;
+                nextState.winningCombination = winningCombination;
                 return nextState;
             }
 
@@ -211,11 +234,14 @@
                 if (gameState.boardState[a] &&
                     gameState.boardState[a] === gameState.boardState[b] &&
                     gameState.boardState[a] === gameState.boardState[c]) {
-                    return gameState.boardState[a];
+                    return {
+                        winner: gameState.boardState[a],
+                        winningCombination: combination
+                    };
                 }
             }
 
-            return null;
+            return { winner: null, winningCombination: null };
         }
 
         function checkDraw(gameState) {
@@ -246,7 +272,8 @@
             boardState: Array(CELL_COUNT).fill(null),
             currentPlayer: 'X',
             isGameActive: true,
-            winner: null
+            winner: null,
+            winningCombination: null
         };
 
         let gameState;
