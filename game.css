@@ -47,6 +47,22 @@ button:hover {
     background-color: #f0f0f0;
 }
 
+.mark {
+    font-family: "Gaegu", sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+#game-title .mark {
+    font-size: 4rem;
+}
+
+.button-mode {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 20px 10px;
+}
+
 #status-display {
     margin: 30px 30px 40px 30px;
     font-size: 1.5rem;
@@ -109,14 +125,4 @@ button:hover {
 
 .cell.winning {
     color: #5da55d;
-}
-
-.mark {
-    font-family: "Gaegu", sans-serif;
-    font-size: 2rem;
-    font-weight: 700;
-}
-
-#game-title .mark {
-    font-size: 4rem;
 }
