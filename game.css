@@ -19,6 +19,15 @@ body {
     min-height: 100vh;
 }
 
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:visited {
+    color: inherit;
+}
+
 button {
     font-family: inherit;
     font-weight: inherit;
@@ -45,6 +54,34 @@ button:hover {
     font-size: 2.2rem;
     font-weight: 200;
     background-color: #f0f0f0;
+}
+
+.mark {
+    font-family: "Gaegu", sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+#game-title .mark {
+    font-size: 4rem;
+}
+
+#game-mode-button-holder {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+#game-mode-button-holder a {
+    width: 240px;
+}
+
+.mode-button {
+    font-size: 1.5rem;
+    width: 100%;
+    padding: 10px 0;
 }
 
 #status-display {
@@ -79,10 +116,25 @@ button:hover {
     margin: auto;
 }
 
-#restart-button {
-    font-size: 1.5rem;
-    font-weight: 600;
+.controls-holder {
+    display: flex;
+    justify-content: space-evenly;
     margin-top: 40px;
+    gap: 40px;
+}
+
+.controls-holder a,
+.controls-holder button {
+    width: 60px;
+}
+
+.control-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: 600;
+    width: 60px;
 }
 
 .cell {
@@ -109,14 +161,4 @@ button:hover {
 
 .cell.winning {
     color: #5da55d;
-}
-
-.mark {
-    font-family: "Gaegu", sans-serif;
-    font-size: 2rem;
-    font-weight: 700;
-}
-
-#game-title .mark {
-    font-size: 4rem;
 }
