@@ -3,13 +3,13 @@
 function renderStatusDisplay(display, gameState) {
     if (!gameState.isGameActive) {
         if (gameState.winner) {
-            display.innerHTML = `<span><span class="mark">${gameState.winner}</span> wins</span> <span>⛄︎</span> <span><span class="mark">${gameState.winner}</span> 获胜</span>`;
+            display.innerHTML = `<span><span class="mark">${gameState.winner}</span> wins</span> <span class="mark">☺︎</span> <span><span class="mark">${gameState.winner}</span> 获胜</span>`;
         } else {
             display.innerHTML = `<span>Draw</span> <span><span class="mark">XO</span></span> <span>平局</span>`;
         }
         return;
     }
-    display.innerHTML = `<span><span class="mark">${gameState.currentPlayer}</span>'s turn</span> <span>☕︎</span> <span>轮到 <span class="mark">${gameState.currentPlayer}</span> 了</span>`;
+    display.innerHTML = `<span><span class="mark">${gameState.currentPlayer}</span> play</span> <span class="mark">⛄︎</span> <span>轮到 <span class="mark">${gameState.currentPlayer}</span></span>`;
 }
 
 function renderBoard(board, size, cellSize = 120, gapSize = 10) {
