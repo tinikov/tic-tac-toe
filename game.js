@@ -1,14 +1,15 @@
+// ======= Functions =======
 // Renderers
 function renderStatusDisplay(display, gameState) {
     if (!gameState.isGameActive) {
         if (gameState.winner) {
-            display.innerHTML = `<span><span class="mark">${gameState.winner}</span> wins</span> <span class="mark">☺︎</span> <span><span class="mark">${gameState.winner}</span> 获胜</span>`;
+            display.innerHTML = `<span><span class="mark">${gameState.winner}</span> wins</span> <span>⛄︎</span> <span><span class="mark">${gameState.winner}</span> 获胜</span>`;
         } else {
             display.innerHTML = `<span>Draw</span> <span><span class="mark">XO</span></span> <span>平局</span>`;
         }
         return;
     }
-    display.innerHTML = `<span><span class="mark">${gameState.currentPlayer}</span> play</span> <span class="mark">⛄︎</span> <span>轮到 <span class="mark">${gameState.currentPlayer}</span></span>`;
+    display.innerHTML = `<span><span class="mark">${gameState.currentPlayer}</span>'s turn</span> <span>☕︎</span> <span>轮到 <span class="mark">${gameState.currentPlayer}</span> 了</span>`;
 }
 
 function renderBoard(board, size, cellSize = 120, gapSize = 10) {
@@ -126,3 +127,47 @@ function resetGame(initialStatus, cells, statusDisplay) {
     renderGame(newState, cells, statusDisplay);
     return newState;
 }
+
+// ======== Main =======
+// Game constants
+const BOARD_SIZE = 3;
+const CELL_COUNT = BOARD_SIZE * BOARD_SIZE;
+const CELL_SIZE_PX = 120;
+const CELL_GAP_PX = 12;
+const BOARD_MAX_WIDTH_PX = BOARD_SIZE * CELL_SIZE_PX + (BOARD_SIZE - 1) * CELL_GAP_PX;
+
+// DOM elements
+const container = document.querySelector('.container');
+const statusDisplay = document.getElementById('status-display');
+const board = document.getElementById('board');
+const restartButton = document.getElementById('restart-button');
+
+const initialStatus = {
+    boardState: Array(CELL_COUNT).fill(null),
+    currentPlayer: 'X',
+    isGameActive: true,
+    winner: null,
+    winningCombination: null
+};
+
+let gameState;
+
+// Initialize game
+container.style.maxWidth = `${BOARD_MAX_WIDTH_PX}px`;
+
+const cells = renderBoard(board, BOARD_SIZE, CELL_SIZE_PX, CELL_GAP_PX);
+cells.forEach((cell, index) => {
+    cell.onclick = () => {
+        const newState = makeMove(index, gameState);
+        if (newState !== gameState) {
+            gameState = newState;
+            renderGame(gameState, cells, statusDisplay);
+        }
+    };
+});
+
+restartButton.onclick = () => {
+    gameState = resetGame(initialStatus, cells, statusDisplay);
+}
+
+gameState = resetGame(initialStatus, cells, statusDisplay);
