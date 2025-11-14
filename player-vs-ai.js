@@ -1,23 +1,153 @@
-// ======= Functions =======
+// Set up Google GenAI
+import { GoogleGenAI } from "@google/genai";
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GOOGLE_GENAI_API_KEY });
 
-// AI makes a random move
-function aiMakeMove(gameState) {
-    // Find all empty cells
-    const emptyCells = [];
-    for (let i = 0; i < gameState.boardState.length; i++) {
-        if (gameState.boardState[i] === null) {
-            emptyCells.push(i);
+// ======= Functions =======
+// Renderers
+function renderStatusDisplay(display, gameState) {
+    if (!gameState.isGameActive) {
+        if (gameState.winner) {
+            display.innerHTML = `<span><span class="mark">${gameState.winner}</span> wins</span> <span class="mark">☺︎</span> <span><span class="mark">${gameState.winner}</span> 获胜</span>`;
+        } else {
+            display.innerHTML = `<span>Draw</span> <span><span class="mark">XO</span></span> <span>平局</span>`;
         }
+        return;
+    }
+    if (gameState.currentPlayer === 'X') {
+        display.innerHTML = `<span><span class="mark">${gameState.currentPlayer}</span> play</span> <span class="mark">⛄︎</span> <span>轮到 <span class="mark">${gameState.currentPlayer}</span></span>`;
+    } else {
+        display.innerHTML = `<span class="mark">X</span> <span>AI 思考中...</span><span class="mark">O</span>`;
+    }
+}
+
+function renderBoard(board, size, cellSize = 120, gapSize = 10) {
+    // Create grid layout
+    board.innerHTML = ''; // Clear existing board
+    board.style.display = 'grid';
+    board.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
+    board.style.gridTemplateRows = `repeat(${size}, ${cellSize}px)`;
+    board.style.gap = `${gapSize}px`;
+
+    // Create cells
+    const cells = [];
+    for (let i = 0; i < size ** 2; i++) {
+        const cell = document.createElement('button');
+        cell.classList.add('cell');
+        cell.textContent = '';
+        cell.dataset.index = i;
+        cells.push(cell);
+
+        board.appendChild(cell);
     }
 
-    // If no empty cells, return current state
-    if (emptyCells.length === 0) {
+    return cells;
+}
+
+function renderGame(gameState, cells, display) {
+    //Update cells
+    cells.forEach((cell, index) => {
+        cell.textContent = gameState.boardState[index] || '';
+        cell.disabled = gameState.boardState[index] !== null || !gameState.isGameActive;
+        // Highlight winning combination
+        if (gameState.winningCombination?.includes(index)) {
+            cell.classList.add('winning');
+        } else {
+            cell.classList.remove('winning');
+        }
+    });
+    // Update status display
+    renderStatusDisplay(display, gameState);
+}
+
+// Game logic
+function makeMove(index, gameState) {
+
+    if (!gameState.isGameActive || gameState.boardState[index] !== null) {
         return gameState;
     }
 
-    // Randomly select an empty cell
-    const randomIndex = Math.floor(Math.random() * emptyCells.length);
-    const cellIndex = emptyCells[randomIndex];
+    const nextState = {
+        ...gameState,
+        boardState: [...gameState.boardState]
+    };
+
+    nextState.boardState[index] = gameState.currentPlayer;
+
+    // Check for winner
+    const { winner, winningCombination } = checkWinner(nextState);
+    if (winner) {
+        nextState.isGameActive = false;
+        nextState.winner = winner;
+        nextState.winningCombination = winningCombination;
+        return nextState;
+    }
+
+    // Check for draw
+    if (checkDraw(nextState)) {
+        nextState.isGameActive = false;
+        nextState.winner = null;
+        return nextState;
+    }
+
+    // Switch player
+    nextState.currentPlayer = gameState.currentPlayer === 'X' ? 'O' : 'X';
+
+    return nextState;
+}
+
+function checkWinner(gameState) {
+    const winningCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+
+    for (const combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (gameState.boardState[a] &&
+            gameState.boardState[a] === gameState.boardState[b] &&
+            gameState.boardState[a] === gameState.boardState[c]) {
+            return {
+                winner: gameState.boardState[a],
+                winningCombination: combination
+            };
+        }
+    }
+
+    return { winner: null, winningCombination: null };
+}
+
+function checkDraw(gameState) {
+    return gameState.boardState.every(cell => cell !== null);
+}
+
+// Reset game
+function resetGame(initialStatus, cells, statusDisplay) {
+    const newState = {
+        ...initialStatus,
+        boardState: [...initialStatus.boardState]
+    };
+    renderGame(newState, cells, statusDisplay);
+    return newState;
+}
+
+// AI makes a random move
+async function aiMakeMove(gameState) {
+    // Send board state to AI and get its move
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: "The current board state is " + gameState.boardState + ". Where do you want to place your O?",
+        config: {
+            systemInstruction: "We are now playing tic-tac-toe game. The cells of the board are numbered from 0 to 8. For example: top-left is 0, top-middle is 1, top-right is 2,... You are playing as 'O' and I am playing as 'X'. I will give you the board state array. The array index represent the cell number. Please respond with the index of the cell where you want to place your 'O'. You can only choose an empty cell. You have to respond with only the index number. You have to play to win.",
+        },
+    });
+    const cellIndex = parseInt(response.text);
+    console.log("AI chose cell index: ", cellIndex);
 
     // Make the move for AI
     return makeMove(cellIndex, gameState);
@@ -52,7 +182,7 @@ container.style.maxWidth = `${BOARD_MAX_WIDTH_PX}px`;
 
 const cells = renderBoard(board, BOARD_SIZE, CELL_SIZE_PX, CELL_GAP_PX);
 cells.forEach((cell, index) => {
-    cell.onclick = () => {
+    cell.onclick = async () => {
         // Player makes a move (X)
         const newState = makeMove(index, gameState);
         if (newState !== gameState) {
@@ -65,11 +195,9 @@ cells.forEach((cell, index) => {
                 cells.forEach(c => c.disabled = true);
 
                 // Add a slight delay so player can see their move
-                setTimeout(() => {
-                    const aiState = aiMakeMove(gameState);
-                    gameState = aiState;
-                    renderGame(gameState, cells, statusDisplay);
-                }, 500); // 500ms delay
+                const aiState = await aiMakeMove(gameState);
+                gameState = aiState;
+                renderGame(gameState, cells, statusDisplay);
             }
         }
     };
