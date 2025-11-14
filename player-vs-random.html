@@ -16,11 +16,16 @@
         <div id="game-title">
             Tic-Tac-Toe <span class="mark">XO</span> 井字棋
         </div>
-        <div id="game-mode-button-holder">
-            <a href="player-vs-player.html"><button class="mode-button">PvP <span class="mark">☺︎</span> 玩家对战</button></a>
-            <a href="player-vs-random.html"><button class="mode-button">PvE <span class="mark">☺︎</span> 人机对战</button></a>
-            <a href="player-vs-ai.html"><button class="mode-button">vAI <span class="mark">☺︎</span> 困难对战</button></a>
+        <div id="status-display"></div>
+        <div id="board"></div>
+        <div class="controls-holder">
+            <a href="index.html"><button class="control-button">←</button></a>
+            <button id="restart-button" class="control-button">↺</button>
         </div>
+    </div>
+
+    <script src="common-functions.js"></script>
+    <script src="player-vs-random.js"></script>
 </body>
 
 </html>
